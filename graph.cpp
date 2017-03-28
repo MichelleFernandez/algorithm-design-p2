@@ -45,6 +45,14 @@ class Edge {
     return -cost;
   }
 
+  int get_cost(){
+    return cost;
+  }
+
+  int get_benefit(){
+    return benef;
+  }
+
 };
 
 
