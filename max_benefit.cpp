@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <algorithm>    // std::random_shuffle
 #include <vector>
+#include <cstdlib>
 #include "graph.cpp"
 
 using namespace std;
@@ -151,6 +153,37 @@ vector<Edge> maxBenefitPath(Graph graph, int deposit) {
 }
 
 
+Edge obtenerLado(std::vector<std::vector<Edge> > T, int b){
+  
+  std::vector<Edge> prob;
+  for(std::vector<Edge>::iterator e = T[b].begin(); e != T[b].end(); ++e){
+    if(e-> n1 == b){
+      for(int i = 0; i < e->getBenefit(); i++){
+        prob.push_back(*e);
+      }
+    }
+  }
+  std::random_shuffle (prob.begin(), prob.end());
+  int index = (rand() % (int)(prob.size() -1));
+
+  return prob[index];
+}
+
+std::vector<Edge> obtenerCamino(std::vector<std::vector<Edge> > ccm){
+
+  std::vector<std::vector<Edge> > prob;
+  for(auto c = ccm.begin(); c != ccm.end(); ++c){
+    for(auto e = c->begin(); e != c->end(); e++){
+      for(int i = 0; i < e->getBenefit(); i++){
+        prob.push_back(*c);
+      }
+    }
+  }
+  std::random_shuffle (prob.begin(), prob.end());
+  int index = (rand() % (int)(prob.size() -1));
+
+  return prob[index];
+}
 
 int main(int argc, char **argv) {
 
