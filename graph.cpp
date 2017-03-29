@@ -64,11 +64,11 @@ class Graph {
   int vertex;           // num of vertices
   int edges;            // num of edges 
   // vector<bool> visited; // store if a vertex was visited 
-  vector<vector<Edge>> a_list;  // lists of edges
-  vector<vector<Edge>> t_list;  // list of R U Q edges
+  vector<vector<Edge> > a_list;  // lists of edges
+  vector<vector<Edge> > t_list;  // list of R U Q edges
 
 
-  Graph(int vertex, int edges, vector<vector<Edge>> &eds, vector<vector<Edge>> &t_eds) { 
+  Graph(int vertex, int edges, vector<vector<Edge> > &eds, vector<vector<Edge> > &t_eds) { 
     this->vertex = vertex; 
     this->edges = edges;
     this->a_list = eds;
@@ -239,7 +239,7 @@ Graph * buildGraph(string filename) {
   int cost, benef;
   char c;
 
-  vector<vector<Edge>> t_eds;  // R U Q edges vector
+  vector<vector<Edge> > t_eds;  // R U Q edges vector
 
   ifstream file(filename.c_str());  // file stream
 
@@ -250,7 +250,7 @@ Graph * buildGraph(string filename) {
     sstream.str(line);
     sstream >> tmp >> tmp >> tmp >> c >> vertex;
     
-    vector<vector<Edge>> eds(vertex+1);  // edges vector
+    vector<vector<Edge> > eds(vertex+1);  // edges vector
 
     getline(file, line);
 
