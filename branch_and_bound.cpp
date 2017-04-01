@@ -2,57 +2,76 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <vector>
-#include <ctime>
 #include <unordered_set>
+#include <ctime>
 #include "max_benefit.cpp"
 
-std::vector<vector<Edge> > solParcial;
-std::vector<vector<Edge> > mejorSol;
+time_t t_start;
+time_t t_end;
+double dif;
+std::vector<Edge> solParcial;
+std::vector<Edge> mejorSol; // se obtiene de max_benefit
 int beneficioDisponible;
-// donde guardo los nodos que pertenecen a la sol?
+std::unordered_set<int> solP = {1};
 
-std::vector<Edge> obtener_lista_de_sucesores(int v){
+bool compare_edges(Edge e1, Edge e2){
+	return(e1.getBenefit() < e2.getBenefit());
+}
+
+//ya
+std::vector<Edge> obtener_lista_de_sucesores(int v, std::vector<vector<Edge> > g){
 	std::vector<Edge> L;
-	for(std::vector<Edge>::iterator e = solParcial[v].begin(); e != solParcial[v].end(); ++e){
+	for(std::vector<Edge>::iterator e = g[v].begin(); e != g[v].end(); ++e){
 		L.push_back(*e);
 		Edge e1(e -> n1, e-> n2, e -> get_cost(), 0);
 		L.push_back(e1);
 	}
-
+	std::sort (L.begin(), L.end(), compare_edges);
 	return L;
 }
-int beneficio(std::vector<vector<Edge> > g){
+
+// ya
+int beneficio(std::vector<Edge> g){
 	int v = 0;
 	int b = 0;
-	while(!g[v].empty() and v < g.size()){
-		Edge e = g[v][0];
-		g[v].erase(g[v].begin());
-		b = b + (e.get_benefit() - e.get_cost());
-		v = e.n1;
+	while(!g.empty() and v < g.size()){
+		//Edge e = g[v];
+		//g.erase(g.begin());
+		b += (g[v].getBenefit());
+		v += 1;
 	}
 	return b;
 }
 
-bool ciclo_negativo(Edge e, std::vector<vector<Edge> > solParcial){
-	// verificar si e.n2 ya está en la solucion parcial
-	// en caso true, se ve que el ciclo no sea negativo
-	if(true){
-		if(true){
+//ya
+bool ciclo_negativo(Edge e, std::vector<Edge> solParcial){
+	
+	std::vector<Edge> aux;
+	std::copy(solParcial.begin(), solParcial.end(), std::back_inserter(aux));
+	std::unordered_set<int>::iterator it = solP.find(e.n2);
+	if(it == solP.end()){
+		return false; // no es ciclo
+	}
+	else{
+		aux.push_back(e);
+		if(beneficio(aux) < 0){
 			return true;
 		}
-	}
-	return false;
-}
-
-bool esta_lado_en_sol_parcial(Edge e, std::vector<vector<Edge> > solParcial){
-
-	int count = 0;
-	for (std::vector<Edge>::iterator ed = solParcial[e.n1].begin(); ed != solParcial[e.n1].end(); ++ed){
-		if(e.n1 == ed -> n1){
-			count++;
+		else{
+			return false;
 		}
 	}
+}
 
+//ya
+bool esta_lado_en_sol_parcial(Edge e, std::vector<Edge> solParcial){
+
+	int count = 0;
+	for(int i = 0; i < solParcial.size(); ++i){
+		if(e == solParcial[i]){
+			count += 1;
+		}
+	}
 	if (count == 0){
 		return false;
 	} else if (count == 1){
@@ -68,16 +87,40 @@ bool esta_lado_en_sol_parcial(Edge e, std::vector<vector<Edge> > solParcial){
 	}
 }
 
-bool repite_ciclo(std::vector<Edge> L, Edge e, std::vector<vector<Edge> > solParcial){
+// ya
+Edge find_edge(int n1, std::vector<Edge> solParcial){
+	for (int i = 0; i < solParcial.size(); ++i){
+		if(solParcial[i].n1 == n1){
+			return solParcial[i];
+		}
+	}
+}
+
+//ya
+bool repite_ciclo(Edge e, std::vector<Edge> solParcial){
 	
+	for(std::unordered_set<int>::iterator it = solP.begin(); it != solP.end(); ++it){
+		int aux = *it;
+		if(e.n2 == aux){
+			Edge ed = find_edge(aux, solParcial);
+
+			if((e.get_benefit()-e.get_cost()) < (ed.get_benefit()- ed.get_cost())){
+				return false;
+			}
+			else{
+				return true;
+			}
+		}
+	}
 	return false;
 }
 
-bool cumple_acotamiento(Edge e, std::vector<vector<Edge> > solParcial){
+//ya
+bool cumple_acotamiento(Edge e, std::vector<Edge> &solParcial){
 	int beneficioE = e.get_benefit() - e.get_cost();
 	int beneficioSolParcial = beneficio(solParcial) + beneficioE;
 	int maxBeneficio = beneficioDisponible - max(0, beneficioE) + beneficioSolParcial;
-	if(maxBeneficio <= beneficio(mejorSol)){
+	if(maxBeneficio < beneficio(mejorSol)){
 		return false;
 	}
 	else{
@@ -85,36 +128,36 @@ bool cumple_acotamiento(Edge e, std::vector<vector<Edge> > solParcial){
 	}
 }
 
-int vertice_mas_externo(std::vector<vector<Edge> > v);
-
-
-
-void agregar_lado(Edge e, std::vector<vector<Edge> > solParcial){
-	solParcial[e.n1].push_back(e);
+//ya
+void agregar_lado(Edge e, std::vector<Edge> &solParcial){
+	solParcial.push_back(e);
+	solP.insert(e.n2);
 }
 
-Edge eliminar_ultimo_lado(std::vector<vector<Edge> > solParcial){
+//ya
+Edge eliminar_ultimo_lado(std::vector<Edge> &solParcial){
 
-	std::vector<vector<Edge> > aux = solParcial;
-	int v = 0;
-	int be;
-	int ce;
-	Edge e = aux[0][0];
-	while (!aux[v].empty() && v < aux.size()) {
-        e = aux[v][0]; // First element
-        aux[v].erase(aux[v].begin());
+	//std::vector<Edge> aux;
+	//std::copy(solParcial.begin(), solParcial.end(), aux.begin());
+	//int v = 0;
+	//int be;
+	//int ce;
+	/*while (!aux.size == 1 && v < aux.size()) {
+        Edge e1(aux[v].n1, aux[v].n2, aux[v].cost, aux[v].benef, aux[v].crossed); // First element
+        aux.erase(aux.begin());
         be = e.get_benefit();
         ce = e.get_cost();
-        //vToDelete = vOut;
-        v = e.n1;
-    }
-    Edge e1(e.n1, e.n2, ce, be);
-    solParcial[v].erase(solParcial[v].end());
+        v += 1;
+        aux.erase(aux.begin());
+    }*/
+    Edge last = solParcial.back();
+    Edge e(last.n1, last.n2, last.cost, last.benef, last.crossed);
+    solParcial.erase(solParcial.end());
 
-    return e1;
+    return e;
 }
 
-void busqueda_en_profundidad(int v){
+void busqueda_en_profundidad(int v, std::vector<vector<Edge> > g){
 	// vemos si se encuentra una mejor solución factible
 	if (v == 1){ //1 es el depósito
 		if(beneficio(solParcial) > beneficio(mejorSol)){
@@ -122,25 +165,100 @@ void busqueda_en_profundidad(int v){
 		}
 	} 
 
-	std::vector<Edge> L = obtener_lista_de_sucesores(v); //lista de aristas
+	std::vector<Edge> L = obtener_lista_de_sucesores(v,g); //lista de aristas
 	int ce;
 	int be;
 	for(int i =0; i < L.size(); i++){
-		Edge e = L[i];
+		// copio L[i] en e
+		Edge e(L[i].n1, L[i].n2, L[i].cost, L[i].benef, L[i].crossed);
+		cout << e.n1 << "-" << e.n2 << "\n";
+		cout << ciclo_negativo(e, solParcial) << "-ciclo neg" << "\n";
+		cout << esta_lado_en_sol_parcial(e, solParcial) << "-esta lado" << "\n";
+		cout << repite_ciclo(e, solParcial) << "-rep ciclo" << "\n";
+		cout << cumple_acotamiento(e, solParcial) << "-acota" << "\n";
 		if(!ciclo_negativo(e, solParcial) &&
 			!esta_lado_en_sol_parcial(e, solParcial) &&
-			!repite_ciclo(L, e, solParcial) &&
+			!repite_ciclo(e, solParcial) &&
 			cumple_acotamiento(e, solParcial)){
+				cout << e.crossed << " crossed antes\n";
+				//e.crossed = true;
 				agregar_lado(e, solParcial);
+				cout << e.crossed << " crossed despues\n";
 				ce = e.get_cost();
 				be = e.get_benefit();
 				beneficioDisponible = beneficioDisponible - max(0, be-ce);
-				busqueda_en_profundidad(e.n1);
+				t_end = time(NULL);
+				/*dif= difftime(t_end,t_start);
+				if(dif> 1800){
+					cout << "T\n";
+					exit(0);
+				}*/
+				cout << e.n2;
+				busqueda_en_profundidad(e.n2, g);
 		}
 	}
 
-	Edge e = eliminar_ultimo_lado(solParcial);
-	ce = e.get_cost();
-	be = e.get_benefit();
+	Edge e_c = eliminar_ultimo_lado(solParcial);
+	ce = e_c.get_cost();
+	be = e_c.get_benefit();
 	beneficioDisponible = beneficioDisponible + max(0, be-ce);
+}
+
+int main(int argc, char **argv){
+	Graph *graph;       // instance graph structure
+  	string filename;    // input file name 
+
+  	int vo, voHeur;     // optimum values
+  	int sdHeur;         // standard deviation against given optimum value
+
+  	int deposit;
+
+  	filename = argv[1];
+  // vo = atoi(argv[2]);
+  	deposit = atoi(argv[2]);
+
+  	int n_1 = atoi(argv[3]);
+
+  	int n_2 = atoi(argv[4]);
+
+  // build the graph with the instance data
+  	graph = buildGraph(filename);
+
+  	//graph->printGraph();
+
+  	//mejorSol = maxBenefitPath(graph, deposit);
+  	//beneficioDisponible = beneficio(mejorSol);
+  	//busqueda_en_profundidad(deposit, graph->t_list);
+  	std::vector<Edge> v;
+  	Edge e1(1,2,2,10);
+  	v.push_back(e1);
+  	Edge e2(2,3,3,2);
+  	v.push_back(e2);
+  	Edge e3(3,4,3,4);
+  	v.push_back(e3);
+  	Edge e4(4,5,2,8);
+  	v.push_back(e4);
+  	Edge e5(5,2,1,3);
+  	v.push_back(e5);
+  	Edge e6(2,1,2,10,true);
+  	v.push_back(e6);
+  	std::copy(v.begin(), v.end(), std::back_inserter(mejorSol));
+
+  	Edge dep(1,1,0,0, true);
+  	solParcial.push_back(dep);
+  	t_start = time(NULL);
+  	beneficioDisponible = beneficio(v);
+  	cout << "bn: " << beneficioDisponible << "\n";
+  	/*for (auto m = v.begin() ; m != v.end() ; ++m) {
+    	cout << m->n1 << '-' << m->n2 << '\n';
+  	}*/
+
+  	busqueda_en_profundidad(1, graph->t_list);
+  	for (auto m = mejorSol.begin() ; m != mejorSol.end() ; ++m) {
+    	cout << m->n1 << '-' << m->n2 << '\n';
+  	}
+  	//bool b = ciclo_negativo(e6, v);
+  	//cout << "bool: " << b;
+  	return 0;
+
 }

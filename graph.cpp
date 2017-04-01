@@ -45,6 +45,10 @@ class Edge {
     return -cost;
   }
 
+  void setCrossed() {
+    crossed = true;
+  }
+
   int get_cost(){
     return cost;
   }
@@ -52,9 +56,7 @@ class Edge {
   int get_benefit(){
     return benef;
   }
-
 };
-
 
 // Graph class
 class Graph {
@@ -63,7 +65,7 @@ class Graph {
 
   int vertex;           // num of vertices
   int edges;            // num of edges 
-  // vector<bool> visited; // store if a vertex was visited 
+
   vector<vector<Edge> > a_list;  // lists of edges
   vector<vector<Edge> > t_list;  // list of R U Q edges
 
@@ -75,6 +77,43 @@ class Graph {
     this->t_list = t_eds;
   }
 
+  bool eraseEdge(Edge edge) {
+    auto m = this->t_list[edge.n1].begin();
+
+    while (m->n2 != edge.n2) {
+      cout << m->n2;
+      ++m;
+    }
+
+    if (m->n2 == edge.n2) {
+      t_list[edge.n1].erase(m);
+    } else {
+      return false;
+    }
+
+    m = this->t_list[edge.n2].begin();
+
+    while (m->n2 != edge.n1) {
+      ++m;
+    }
+
+    if (m->n2 == edge.n1) {
+      t_list[edge.n2].erase(m);
+      return true;
+    } else {
+      return false;
+    }    
+  }
+
+  bool tEmpty() {
+    if (t_list.empty()) return true;
+
+    for (auto n=this->t_list.begin(); n != this->t_list.end() ; ++n) {
+      if (!n->empty()) return false;
+    }
+
+    return true;
+  }
 
 
   /*
@@ -166,15 +205,40 @@ class Graph {
   //   return false;
   // }
 
-  // mark and edge as crossed
-  // void setCrossed(int u, int v){
-  //   for (int i=0; i< a_list.size(); i++){
-  //     if((a_list[i].n1 == u && a_list[i].n2) == v ||
-  //     (a_list[i].n1 == v && a_list[i].n2 == u)){
-  //       a_list[i].crossed = true;
-  //     }
-  //   }
-  // }
+  // mark an edge as crossed
+  bool crossEdge(Edge edge) {
+    auto m = this->t_list[edge.n1].begin();
+
+    while (m->n2 != edge.n2) {
+      cout << m->n2;
+      ++m;
+    }
+
+    if (m->n2 == edge.n2) {
+      m->setCrossed();
+    } else {
+      return false;
+    }
+
+    m = this->t_list[edge.n2].begin();
+
+    while (m->n2 != edge.n1) {
+      ++m;
+    }
+
+    if (m->n2 == edge.n1) {
+      m->setCrossed();
+      return true;
+    } else {
+      return false;
+    }  
+  }
+
+  void crossEdges(vector<Edge> edges) {
+    for (auto m = edges.begin() ; m != edges.end() ; ++m) {
+      m->setCrossed();
+    }
+  }
 
   // return the edge composse by the nodes u,v
   // Edge getEdge(int u, int v){
@@ -217,6 +281,7 @@ class Graph {
         cout << m->n2 << ' ';
         cout << m->cost << ' ';
         cout << m->benef << ' ';
+        cout << m->crossed << ' ';        
         cout << '\n';
       }
       ++i;
