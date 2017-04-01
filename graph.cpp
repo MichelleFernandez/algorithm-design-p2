@@ -21,12 +21,12 @@ class Edge {
   bool crossed; // says if tt was crossed
 
 
-  Edge(int n1, int n2, int c, int b) {
+  Edge(int n1, int n2, int c, int b, bool cross = false) {
     this->n1 = n1;
     this->n2 = n2;
     this->cost = c;
     this->benef = b;
-    this->crossed = false;
+    this->crossed = cross;
   }
 
   // defintion of comparator operator

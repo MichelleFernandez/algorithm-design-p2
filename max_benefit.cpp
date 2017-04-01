@@ -274,6 +274,8 @@ vector<Edge> maxBenefitPath(Graph graph, int deposit) {
 }
 
 
+/*
+>>>>>>> 12eaa19d2ebb68e728578434440cefc22e4ddf29
 int main(int argc, char **argv) {
 
   Graph *graph;       // instance graph structure
@@ -340,4 +342,4 @@ int main(int argc, char **argv) {
   // file.close();
   
   return 0;
-}
+}*/
