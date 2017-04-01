@@ -2,11 +2,13 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <vector>
+#include <unordered_set>
 #include "max_benefit.cpp"
 
 std::vector<vector<Edge> > solParcial;
 std::vector<vector<Edge> > mejorSol;
 int beneficioDisponible;
+std::unordered_set<int> solP = {1};
 // donde guardo los nodos que pertenecen a la sol?
 
 std::vector<Edge> obtener_lista_de_sucesores(int v){
@@ -125,9 +127,9 @@ void busqueda_en_profundidad(int v){
 	int be;
 	for(int i =0; i < L.size(); i++){
 		Edge e = L[i];
-		if(!ciclo_negativo(e, solParcial) and 
-			!esta_lado_en_sol_parcial(e, solParcial) and
-			!repite_ciclo(L, e, solParcial) and
+		if(!ciclo_negativo(e, solParcial) &&
+			!esta_lado_en_sol_parcial(e, solParcial) &&
+			!repite_ciclo(L, e, solParcial) &&
 			cumple_acotamiento(e, solParcial)){
 				agregar_lado(e, solParcial);
 				ce = e.get_cost();

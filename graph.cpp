@@ -30,11 +30,11 @@ class Edge {
   }
 
   // defintion of comparator operator
-  // bool operator==(const Edge &e1) const {
-  //   return n1 == e1.n1 && n2 == e1.n2 &&
-  //       cost == e1.cost && benef == e1.benef
-  //       && crossed == e1.crossed;
-  // }
+  bool operator==(const Edge &e1) const {
+    return n1 == e1.n1 && n2 == e1.n2 &&
+      cost == e1.cost && benef == e1.benef
+      && crossed == e1.crossed;
+  }
 
   // return the benefit of an edge depending on
   // if the edge was already crossed
@@ -75,20 +75,22 @@ class Graph {
     this->t_list = t_eds;
   }
 
+
+
   /*
      maxBenefit
      dijkstra maximum benefit path from source to destination vertices
   */
-  vector<int> maxBenefit(int src, int dst) {
+  vector<Edge> maxBenefit(int src, int dst) {
   // int maxBenefit(int src, int dst) {  
-    vector<int> path;    
+    vector<Edge> path;    
     int vertices_num = this->vertex;
 
     int benefit[vertices_num +1];
     bool visited[vertices_num +1];
 
     int u, v;
-    int next_vertex;
+    Edge next_vertex(0,0,0,0);
     int uv_benefit;
     int max_benefit = -120000;
     int visited_num = 0;
@@ -105,7 +107,7 @@ class Graph {
 
     // set source vertex as starting point
     u = src;
-    path.push_back(u);
+    //path.push_back(u);
 
     while (u != dst && visited_num <= vertices_num) {
       // mark next vertex as visited
@@ -127,7 +129,7 @@ class Graph {
           // find the v vertex with maximum benefit of leaving from u.
           if (uv_benefit > max_benefit) {
             max_benefit = uv_benefit;
-            next_vertex = v;
+            next_vertex = *e;
           }
         }
       }
@@ -136,7 +138,7 @@ class Graph {
       path.push_back(next_vertex);
 
       // set values for next iteration
-      u = next_vertex;
+      u = next_vertex.n2;
       max_benefit = -120000;
     }
 
@@ -249,6 +251,8 @@ Graph * buildGraph(string filename) {
     
     sstream.str(line);
     sstream >> tmp >> tmp >> tmp >> c >> vertex;
+    
+    cout << vertex << "\n";
     
     vector<vector<Edge> > eds(vertex+1);  // edges vector
 

@@ -1,6 +1,7 @@
 // Module for calculate max benefit path
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
 #include <limits.h>
 #include <algorithm>    // std::random_shuffle
 #include <vector>
@@ -107,83 +108,120 @@ int dHeur(int vo, int voHeur) {
     return sd;
 }
 
+std::pair<Edge,std::vector<Edge>::iterator> obtenerLado(std::vector<std::vector<Edge> > T, int b){
+  
+  Edge aux = T[b][0];
+  int max = aux.getBenefit();
+  std::vector<Edge>::iterator iter = T[b].begin();
+  for(std::vector<Edge>::iterator e = T[b].begin(); e != T[b].end(); ++e){
+    if(e-> getBenefit() > max){
+      max = e->getBenefit();
+      aux = *e;
+      iter = e;
+    }
+  }
+
+  return std::make_pair(aux, iter);
+}
+
+int get_c_benef(std::vector<Edge> v){
+  int sum = 0;
+  for(std::vector<Edge>::iterator it = v.begin(); it != v.end(); ++it){
+    sum = sum + it->getBenefit();
+  }
+  return sum;
+}
+
+std::pair<std::vector<Edge>, bool> obtenerCamino(std::vector<std::vector<Edge> > ccm){
+
+  std::vector<Edge> aux = ccm[0];
+  int max = get_c_benef(aux);
+  bool neg_cost = max <= 0;
+
+  for(auto c = ccm.begin(); c != ccm.end(); ++c){
+    if(get_c_benef(*c) > max){
+      max = get_c_benef(*c);
+      neg_cost = max <= 0;
+      aux = *c;
+    }
+  }
+
+  return std::make_pair(aux, neg_cost);
+}
+
+std::vector<Edge> unirCaminoAlCiclo(std::vector<Edge> cicle, std::vector<Edge> path){
+  for(int i=0; i < path.size(); ++i){
+    for(int j=0; j < cicle.size(); ++i){
+      if(!(path[i] == cicle[j])){
+        cicle.push_back(path[i]);
+      }
+    }
+  }
+  return cicle;
+}
+
+
+std::vector<std::vector<Edge> > eliminar_lados(std::vector<Edge> eds, std::vector<std::vector<Edge> >g){
+  
+  for (int i = 0; i < eds.size(); ++i){
+    for(std::vector<Edge>::iterator it = g[eds[i].n1].begin(); it != g[eds[i].n1].end(); i++){
+      if(*it == eds[i]){
+        g[eds[i].n1].erase(it);
+      }
+    }
+  }
+  return g;
+}
+
 vector<Edge> maxBenefitPath(Graph graph, int deposit) {
   vector<Edge> max_benefit_path;
 
   int b;
 
-  // if deposit is not in T set
-  if (graph.t_list[deposit].empty()) {
-    cout << '1';
-  }
-
   b = deposit;
 
   // while T set not empty
-  // while(!graph.t_list.empty()) {
+  while(!graph.t_list.empty()) {
     
-    // if ( !graph.t_edges[b].empty() ) {
-    //   edge = obtainEdge();
-    //   graph.t_edges[b].erase(edge);
-    //   path.push_back(edge);
-    //   b = edge->n2;
+    if ( !graph.t_list[b].empty() ) {
+      std::pair<Edge,std::vector<Edge>::iterator> edge = obtenerLado(graph.t_list,b);
+      graph.t_list[b].erase(edge.second);
+      if(edge.first.getBenefit() > 0){
+        max_benefit_path.push_back(edge.first); // VERIFICAR QUE SE AGREGA BIEN
+        b = edge.first.n2;
+      }
+    } 
+    else {
+      vector<vector<Edge> > ccm;
+      for(int v = 1; v < graph.t_list.size(); ++v){
+        for(int i = 1; i < graph.t_list[v].size(); ++i){
+          std::vector<Edge> cmib = graph.maxBenefit(b, graph.t_list[v][i].n2);
+          ccm.push_back(cmib);
+        }
+      }
 
-    // } else {
-  //     vector<Edge> max_benefit_paths;
-  //     vector<Edge> uv_max_benefit_path;
+      std::pair<vector<Edge>,bool> c_mib = obtenerCamino(ccm);
+      graph.t_list = eliminar_lados(c_mib.first, graph.t_list);
 
-  //     for (int i = 1 ; i < graph.vertex+1 ; ++i) {
-  //       if ( !graph.t_edges[i].empty() ) {
-  //         uv_max_benefit_path = graph.maxBenefit(i,b);
-  //         max_benefit_paths.push_back(uv_max_benefit_path);
-  //       }
-  //     }
+      if(!c_mib.second){
+        max_benefit_path = unirCaminoAlCiclo(max_benefit_path, c_mib.first);
+        b = c_mib.first.back().n2;
 
-  //     path = obtainPath(max_benefit_paths);
-  //     max_benefit_path.push_back(path);
-  //     graph.t_edges.erase()
-    // }
-  // }
+      }
 
-  // if ( !(path.end()->n2 == deposit) ) {
+    }
+  }
 
-  // }
+  if(!max_benefit_path.back().n2 == deposit){
+    std::vector<Edge> cmid = graph.maxBenefit(max_benefit_path.back().n2,deposit);
+    max_benefit_path = unirCaminoAlCiclo(max_benefit_path, cmid);
+  }
 
   return max_benefit_path;
 }
 
 
-Edge obtenerLado(std::vector<std::vector<Edge> > T, int b){
-  
-  std::vector<Edge> prob;
-  for(std::vector<Edge>::iterator e = T[b].begin(); e != T[b].end(); ++e){
-    if(e-> n1 == b){
-      for(int i = 0; i < e->getBenefit(); i++){
-        prob.push_back(*e);
-      }
-    }
-  }
-  std::random_shuffle (prob.begin(), prob.end());
-  int index = (rand() % (int)(prob.size() -1));
 
-  return prob[index];
-}
-
-std::vector<Edge> obtenerCamino(std::vector<std::vector<Edge> > ccm){
-
-  std::vector<std::vector<Edge> > prob;
-  for(auto c = ccm.begin(); c != ccm.end(); ++c){
-    for(auto e = c->begin(); e != c->end(); e++){
-      for(int i = 0; i < e->getBenefit(); i++){
-        prob.push_back(*c);
-      }
-    }
-  }
-  std::random_shuffle (prob.begin(), prob.end());
-  int index = (rand() % (int)(prob.size() -1));
-
-  return prob[index];
-}
 
 int main(int argc, char **argv) {
 
@@ -199,16 +237,20 @@ int main(int argc, char **argv) {
   // vo = atoi(argv[2]);
   deposit = atoi(argv[2]);
 
+  int n_1 = atoi(argv[3]);
+
+  int n_2 = atoi(argv[4]);
+
   // build the graph with the instance data
   graph = buildGraph(filename);
 
   graph->printGraph();
 
   // Prueba de camino de maximo beneficio desde A hasta B (dijkstra)
-  vector<int> path = graph->maxBenefit(5,1);
-
+  vector<Edge> path = graph->maxBenefit(n_1,n_2);
+  std::vector<Edge> v = maxBenefitPath(*graph,1);
   for (auto m = path.begin() ; m != path.end() ; ++m) {
-    cout << '-' << '>' << *m << ' ';
+    cout << '-' << '>' << m->n1 << '-' << m->n2 << ' ';
   }
   cout << '\n';
 
