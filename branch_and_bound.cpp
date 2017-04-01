@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <vector>
+#include <ctime>
 #include <unordered_set>
 #include "max_benefit.cpp"
 
 std::vector<vector<Edge> > solParcial;
 std::vector<vector<Edge> > mejorSol;
 int beneficioDisponible;
-std::unordered_set<int> solP = {1};
 // donde guardo los nodos que pertenecen a la sol?
 
 std::vector<Edge> obtener_lista_de_sucesores(int v){
