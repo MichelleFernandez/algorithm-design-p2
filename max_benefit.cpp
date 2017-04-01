@@ -223,7 +223,7 @@ vector<Edge> maxBenefitPath(Graph graph, int deposit) {
 
 
 
-int main(int argc, char **argv) {
+/*int main(int argc, char **argv) {
 
   Graph *graph;       // instance graph structure
   string filename;    // input file name 
@@ -248,7 +248,7 @@ int main(int argc, char **argv) {
 
   // Prueba de camino de maximo beneficio desde A hasta B (dijkstra)
   vector<Edge> path = graph->maxBenefit(n_1,n_2);
-  std::vector<Edge> v = maxBenefitPath(*graph,1);
+  //std::vector<Edge> v = maxBenefitPath(*graph,1);
   for (auto m = path.begin() ; m != path.end() ; ++m) {
     cout << '-' << '>' << m->n1 << '-' << m->n2 << ' ';
   }
@@ -271,4 +271,4 @@ int main(int argc, char **argv) {
   // file.close();
   
   return 0;
-}
+}*/
