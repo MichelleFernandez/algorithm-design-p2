@@ -207,7 +207,7 @@ class Graph {
 
   // mark an edge as crossed
   bool crossEdge(Edge edge) {
-    auto m = this->t_list[edge.n1].begin();
+    auto m = this->a_list[edge.n1].begin();
 
     while (m->n2 != edge.n2) {
       cout << m->n2;
@@ -220,7 +220,7 @@ class Graph {
       return false;
     }
 
-    m = this->t_list[edge.n2].begin();
+    m = this->a_list[edge.n2].begin();
 
     while (m->n2 != edge.n1) {
       ++m;
@@ -265,6 +265,11 @@ class Graph {
         cout << m->n2 << ' ';
         cout << m->cost << ' ';
         cout << m->benef << ' ';
+        if (m->crossed) {
+          cout << 'Y';
+        } else {
+          cout << 'N';
+        }
         cout << '\n';
       }
       ++i;
@@ -281,7 +286,12 @@ class Graph {
         cout << m->n2 << ' ';
         cout << m->cost << ' ';
         cout << m->benef << ' ';
-        cout << m->crossed << ' ';        
+        if (m->crossed) {
+          cout << 'Y';
+        } else {
+          cout << 'N';
+        }
+
         cout << '\n';
       }
       ++i;
