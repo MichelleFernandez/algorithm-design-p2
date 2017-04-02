@@ -80,7 +80,8 @@ class Graph {
   bool eraseEdge(Edge edge) {
     auto m = this->t_list[edge.n1].begin();
 
-    while (m->n2 != edge.n2) {
+    cout << m->n2;
+    while ((m->n2 != edge.n2) && (m != t_list[edge.n1].end())) {
       cout << m->n2;
       ++m;
     }
@@ -93,7 +94,7 @@ class Graph {
 
     m = this->t_list[edge.n2].begin();
 
-    while (m->n2 != edge.n1) {
+    while (m->n2 != edge.n1 && (m != t_list[edge.n1].end())) {
       ++m;
     }
 
@@ -122,11 +123,12 @@ class Graph {
   */
   vector<Edge> maxBenefit(int src, int dst) {
   // int maxBenefit(int src, int dst) {  
-    vector<Edge> path;    
+    // vector<Edge> path;    
     int vertices_num = this->vertex;
 
     int benefit[vertices_num +1];
     bool visited[vertices_num +1];
+    vector<vector<Edge>> path_to(vertices_num + 1);
 
     int u, v;
     Edge next_vertex(0,0,0,0);
@@ -153,7 +155,7 @@ class Graph {
       visited[u] = true;
       visited_num += 1;
 
-      // for every edge leaving from u, analyze current benefit of v against 
+      // for every not visited edge leaving from u, analyze current benefit of v against 
       // new benefit possible benefit given by the u-v path
       for (auto e = this->a_list[u].begin() ; e != this->a_list[u].end() ; ++e) {
         v = e->n2;
@@ -165,6 +167,15 @@ class Graph {
         if ( !visited[v] && benefit[v] < uv_benefit ) {
           benefit[v] = uv_benefit;
 
+          // store path to next vertex
+          if (!path_to[u].empty()) {
+            // for (auto f = path_to[u].begin() ; f != path_to[u].end() ; ++f) {
+              path_to[v] = path_to[u];
+            // }
+          }
+          path_to[v].push_back(*e);
+
+
           // find the v vertex with maximum benefit of leaving from u.
           if (uv_benefit > max_benefit) {
             max_benefit = uv_benefit;
@@ -173,16 +184,30 @@ class Graph {
         }
       }
 
-      // add  to maximum benefit path
-      path.push_back(next_vertex);
+      // The current path doesnt lead to the deposit
+      if (next_vertex.n2 == u) {
+        // find next max benefit vertex recorded
+        int next_max_benefit = benefit[0];
+        u = 1;
+        for (int i = 1 ; i < vertices_num + 1 ; i++) {
+          if (benefit[i] > next_max_benefit && !visited[i]) {
+            next_max_benefit = benefit[i];
+            u = i;
+          }
+        }
+      } else {
+        // add  to maximum benefit path
+        // path.push_back(next_vertex);
+        u = next_vertex.n2;
+      }
 
       // set values for next iteration
-      u = next_vertex.n2;
       max_benefit = -120000;
     }
 
     // return benefit[dst];
-    return path;
+    // return path;
+    return path_to[dst];
   }
 
   // return the benefit of an edge composse for the nodes
@@ -240,16 +265,6 @@ class Graph {
     }
   }
 
-  // return the edge composse by the nodes u,v
-  // Edge getEdge(int u, int v){
-  //   for (int i=0; i< a_list.size(); i++){
-  //     if(a_list[i].n1 == u && a_list[i].n2 == v){
-  //       return a_list[i];
-  //     }
-  //   }
-  // }
-
-
   /*
      printGraph
      dijkstra maximum benefit path from source to destination vertices
@@ -278,24 +293,24 @@ class Graph {
     cout << '\n';
 
     // all edges
-    i = 0;
-    for (auto n=this->a_list.begin(); n != this->a_list.end() ; ++n) {
-      cout << '[' << i << ']' << '\n';
-      for (auto m = n->begin() ; m != n->end() ; ++m) {
-        cout << m->n1 << ' ';
-        cout << m->n2 << ' ';
-        cout << m->cost << ' ';
-        cout << m->benef << ' ';
-        if (m->crossed) {
-          cout << 'Y';
-        } else {
-          cout << 'N';
-        }
+    // i = 0;
+    // for (auto n=this->a_list.begin(); n != this->a_list.end() ; ++n) {
+    //   cout << '[' << i << ']' << '\n';
+    //   for (auto m = n->begin() ; m != n->end() ; ++m) {
+    //     cout << m->n1 << ' ';
+    //     cout << m->n2 << ' ';
+    //     cout << m->cost << ' ';
+    //     cout << m->benef << ' ';
+    //     if (m->crossed) {
+    //       cout << 'Y';
+    //     } else {
+    //       cout << 'N';
+    //     }
 
-        cout << '\n';
-      }
-      ++i;
-    }
+    //     cout << '\n';
+    //   }
+    //   ++i;
+    // }
   }
 };
 
@@ -327,7 +342,7 @@ Graph * buildGraph(string filename) {
     sstream.str(line);
     sstream >> tmp >> tmp >> tmp >> c >> vertex;
     
-    cout << vertex << "\n";
+    // cout << vertex << "\n";
     
     vector<vector<Edge> > eds(vertex+1);  // edges vector
 
