@@ -97,13 +97,17 @@ Edge find_edge(int n1, std::vector<Edge> solParcial){
 }
 
 void cleanPath(std::vector<Edge> &path){
+	std::vector<std::vector<Edge>::iterator > aux;
 	for(std::vector<Edge>::iterator i = path.begin(); i !=path.end(); ++i){
 		for(std::vector<Edge>::iterator i2 = path.begin(); i2 !=path.end(); ++i2){
 			if(i->n1 == i2->n2 && i->n2 == i2->n1){
-				cout << i->n1 << "-"<< i->n2 << " " << i2->n1 << "-" << i2->n2 << "\n";
-				//i2->crossed = true;
+				aux.push_back(i2);
 			}	
 		}
+	}
+
+	for(int i = 0; i < aux.size()/2; i++){
+		aux[i]->crossed = true;
 	}
 }
 
@@ -127,7 +131,7 @@ bool cumple_acotamiento(Edge e, std::vector<Edge> &solParcial){
 	int beneficioE = e.get_benefit() - e.get_cost();
 	int beneficioSolParcial = beneficio(solParcial) + beneficioE;
 	int maxBeneficio = beneficioDisponible - max(0, beneficioE) + beneficioSolParcial;
-	if(maxBeneficio < beneficio(mejorSol)-1){
+	if(maxBeneficio <= beneficio(mejorSol)-1){
 		return false;
 	}
 	else{
@@ -184,7 +188,7 @@ std::vector<Edge> busqueda_en_profundidad(int v, std::vector<vector<Edge> > g){
 				beneficioDisponible = beneficioDisponible - max(0, be-ce);
 				t_end = time(NULL);
 				dif= difftime(t_end,t_start);
-				if(dif> 108000){ // 1/2 hora 
+				if(dif> 60){ //108000 1/2 hora 
 					cout << "-T-\n";
 					exit(0);
 				}
@@ -219,7 +223,7 @@ int main(int argc, char **argv){
 
   	mejorSol = maxBenefitPath(*graph, deposit);
 
-  	//cleanPath(mejorSol);
+  	cleanPath(mejorSol);
 
   	for(std::vector<Edge>::iterator i = mejorSol.begin(); i != mejorSol.end(); ++i){
   		cout << "Edge: " << i->n1 << "-" << i->n2 << " cross: " << i->crossed << "\n";
@@ -228,12 +232,17 @@ int main(int argc, char **argv){
   	//beneficioDisponible = beneficio(mejorSol);
   	//busqueda_en_profundidad(deposit, graph->t_list);
   	
-  	Edge d(1,1,0,0, true);
+  	Edge d(1,1,0,1, true);
   	solParcial.push_back(d);
   	t_start = time(NULL);
   	beneficioDisponible = beneficio(mejorSol);
   	cout << beneficioDisponible << "\n";
   	mejorSol = busqueda_en_profundidad(1, graph->a_list);
+
+  	for(std::vector<Edge>::iterator i = mejorSol.begin(); i != mejorSol.end(); ++i){
+  		cout << "Edge: " << i->n1 << "-" << i->n2 << " cross: " << i->crossed << "\n";
+  	}
+
   	int vh = beneficio(mejorSol);
   	cout << filename << " " << vh << " " << dif << "\n";
   	return 0;

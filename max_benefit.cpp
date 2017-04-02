@@ -189,9 +189,11 @@ vector<Edge> maxBenefitPath(Graph graph, int deposit) {
 
   if (graph.t_list[b].empty()) {
     pair<Edge,int> edge1 = obtenerLado(graph.a_list, b);
-    max_benefit_path.push_back(edge1.first);
-    graph.crossEdge(edge1.first);    
-    b = edge1.first.n2;
+    graph.crossEdge(edge1.first);  
+    if(edge1.first.getBenefit()> 0){
+      max_benefit_path.push_back(edge1.first);  
+      b = edge1.first.n2;
+    }
   }
 
   int i = 0;
@@ -210,17 +212,22 @@ vector<Edge> maxBenefitPath(Graph graph, int deposit) {
       vector<vector<Edge> > ccm;
       for(int i = 1; i < graph.t_list.size(); ++i){
         if (!graph.t_list[i].empty()) {
-          std::vector<Edge> cmib = graph.maxBenefit(i, b);          
+          std::vector<Edge> cmib = graph.maxBenefit(i,b);          
           ccm.push_back(cmib);
         }
       }
 
       std::pair<vector<Edge>,bool> c_mib = obtenerCamino(ccm);
       graph.eraseEdges(c_mib.first);
+      if(!c_mib.second){
+        max_benefit_path = unirCaminoAlCiclo2(max_benefit_path, c_mib.first);
+        graph.crossEdges(c_mib.first);
+        b = c_mib.first[0].n1;
+      }
 
-      max_benefit_path = unirCaminoAlCiclo2(max_benefit_path, c_mib.first);
+      /*max_benefit_path = unirCaminoAlCiclo2(max_benefit_path, c_mib.first);
       graph.crossEdges(c_mib.first);
-      b = c_mib.first[0].n1;
+      b = c_mib.first[0].n1;*/
     }
   }
 
@@ -228,10 +235,6 @@ vector<Edge> maxBenefitPath(Graph graph, int deposit) {
   if(!(b == deposit)){
     std::vector<Edge> cmid = graph.maxBenefit(deposit,b);
     max_benefit_path = unirCaminoAlCiclo2(max_benefit_path, cmid);
-  }
-
-  for (int i = 0 ; i < max_benefit_path.size() ; i++) {
-    max_benefit_path[i].setCrossed();
   }
 
   return max_benefit_path;
