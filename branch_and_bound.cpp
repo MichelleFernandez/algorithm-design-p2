@@ -207,6 +207,9 @@ int main(int argc, char **argv){
   	//graph->printGraph();
 
   	mejorSol = maxBenefitPath(*graph, deposit);
+  	for(std::vector<Edge>::iterator i = mejorSol.begin(); i != mejorSol.end(); ++i){
+  		cout << "Edge: " << i->n1 << "-" << i->n2 << " cross: " << i->crossed << "\n";
+  	}
   	//beneficioDisponible = beneficio(mejorSol);
   	//busqueda_en_profundidad(deposit, graph->t_list);
   	
