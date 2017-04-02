@@ -1,8 +1,8 @@
-CXX = g++
-OPT = -g -O3
+CXX = g++ 
+OPT = -g -O3 -std=c++11
 
-main: max_benefit.cpp
-	$(CXX) $(OPT) max_benefit.cpp -o $@
+branch_and_bound: branch_and_bound.cpp
+	$(CXX) $(OPT) branch_and_bound.cpp -o $@
 	rm -f $*.c
 
 .PHONY: clean
