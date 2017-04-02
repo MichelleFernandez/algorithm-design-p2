@@ -192,10 +192,6 @@ int main(int argc, char **argv){
   // vo = atoi(argv[2]);
   	deposit = atoi(argv[2]);
 
-  	int n_1 = atoi(argv[3]);
-
-  	int n_2 = atoi(argv[4]);
-
   // build the graph with the instance data
   	graph = buildGraph(filename);
 
@@ -225,7 +221,7 @@ int main(int argc, char **argv){
 
   	mejorSol = busqueda_en_profundidad(1, graph->a_list);
   	int vh = beneficio(mejorSol);
-  	cout << filename << " " << vh << " " dif << "\n";
+  	cout << filename << " " << vh << " " << dif << "\n";
   	return 0;
 
 }
