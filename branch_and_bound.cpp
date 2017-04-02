@@ -96,6 +96,17 @@ Edge find_edge(int n1, std::vector<Edge> solParcial){
 	}
 }
 
+void cleanPath(std::vector<Edge> &path){
+	for(std::vector<Edge>::iterator i = path.begin(); i !=path.end(); ++i){
+		for(std::vector<Edge>::iterator i2 = path.begin(); i2 !=path.end(); ++i2){
+			if(i->n1 == i2->n2 && i->n2 == i2->n1){
+				cout << i->n1 << "-"<< i->n2 << " " << i2->n1 << "-" << i2->n2 << "\n";
+				//i2->crossed = true;
+			}	
+		}
+	}
+}
+
 //ya
 bool repite_ciclo(Edge e, std::vector<Edge> solParcial){
 
@@ -207,9 +218,13 @@ int main(int argc, char **argv){
   	//graph->printGraph();
 
   	mejorSol = maxBenefitPath(*graph, deposit);
+
+  	//cleanPath(mejorSol);
+
   	for(std::vector<Edge>::iterator i = mejorSol.begin(); i != mejorSol.end(); ++i){
   		cout << "Edge: " << i->n1 << "-" << i->n2 << " cross: " << i->crossed << "\n";
   	}
+
   	//beneficioDisponible = beneficio(mejorSol);
   	//busqueda_en_profundidad(deposit, graph->t_list);
   	
