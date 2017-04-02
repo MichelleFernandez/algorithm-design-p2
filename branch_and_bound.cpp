@@ -140,6 +140,14 @@ Edge eliminar_ultimo_lado(std::vector<Edge> &solParcial){
     return e;
 }
 
+void cambiar_cross(Edge e, std::vector<std::vector<Edge> > &g){
+	for(std::vector<Edge>::iterator it = g[e.n2].begin(); it != g[e.n2].end(); ++it){
+		if(e.n1 == it->n2){
+			it->crossed = true;
+		}
+	}
+}
+
 std::vector<Edge> busqueda_en_profundidad(int v, std::vector<vector<Edge> > g){
 	// vemos si se encuentra una mejor solución factible
 	if (v == 1){ //1 es el depósito
@@ -158,6 +166,8 @@ std::vector<Edge> busqueda_en_profundidad(int v, std::vector<vector<Edge> > g){
 			!esta_lado_en_sol_parcial(e, solParcial) &&
 			!repite_ciclo(e, solParcial) &&
 			cumple_acotamiento(e, solParcial)){
+				agregar_lado(e,solParcial);
+				cambiar_cross(e,g);
 				ce = e.get_cost();
 				be = e.get_benefit();
 				beneficioDisponible = beneficioDisponible - max(0, be-ce);
@@ -175,7 +185,6 @@ std::vector<Edge> busqueda_en_profundidad(int v, std::vector<vector<Edge> > g){
 	ce = e_c.get_cost();
 	be = e_c.get_benefit();
 	beneficioDisponible = beneficioDisponible + max(0, be-ce);
-
 	return mejorSol;
 }
 
@@ -197,28 +206,15 @@ int main(int argc, char **argv){
 
   	//graph->printGraph();
 
-  	//mejorSol = maxBenefitPath(*graph, deposit);
+  	mejorSol = maxBenefitPath(*graph, deposit);
   	//beneficioDisponible = beneficio(mejorSol);
   	//busqueda_en_profundidad(deposit, graph->t_list);
-  	std::vector<Edge> v;
-  	Edge e1(1,2,2,10);
-  	v.push_back(e1);
-  	Edge e2(2,3,3,2);
-  	v.push_back(e2);
-  	Edge e3(3,4,3,4);
-  	v.push_back(e3);
-  	Edge e4(4,5,2,8);
-  	v.push_back(e4);
-  	Edge e5(5,2,1,3);
-  	v.push_back(e5);
-  	Edge e6(2,1,2,10,true);
-  	v.push_back(e6);
-  	std::copy(v.begin(), v.end(), std::back_inserter(mejorSol));
+  	
   	Edge d(1,1,0,0, true);
   	solParcial.push_back(d);
   	t_start = time(NULL);
   	beneficioDisponible = beneficio(mejorSol);
-
+  	cout << beneficioDisponible << "\n";
   	mejorSol = busqueda_en_profundidad(1, graph->a_list);
   	int vh = beneficio(mejorSol);
   	cout << filename << " " << vh << " " << dif << "\n";
