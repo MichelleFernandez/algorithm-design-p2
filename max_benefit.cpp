@@ -230,6 +230,10 @@ vector<Edge> maxBenefitPath(Graph graph, int deposit) {
     max_benefit_path = unirCaminoAlCiclo2(max_benefit_path, cmid);
   }
 
+  for (int i = 0 ; i < max_benefit_path.size() ; i++) {
+    max_benefit_path[i].setCrossed();
+  }
+
   return max_benefit_path;
 }
 

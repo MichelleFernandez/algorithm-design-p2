@@ -207,6 +207,14 @@ int main(int argc, char **argv){
   	//graph->printGraph();
 
   	mejorSol = maxBenefitPath(*graph, deposit);
+
+	for(auto c = mejorSol.begin(); c != mejorSol.end(); ++c){
+		cout << c->n1;
+		cout << c->n2;
+		cout << c->crossed;
+		cout << '\n';
+	}
+
   	//beneficioDisponible = beneficio(mejorSol);
   	//busqueda_en_profundidad(deposit, graph->t_list);
   	
