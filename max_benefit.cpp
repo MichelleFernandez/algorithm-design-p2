@@ -233,29 +233,29 @@ vector<Edge> maxBenefitPath(Graph graph, int deposit) {
 }
 
 
-int main(int argc, char **argv) {
+// int main(int argc, char **argv) {
 
-  Graph *graph;       // instance graph structure
-  string filename;    // input file name 
+//   Graph *graph;       // instance graph structure
+//   string filename;    // input file name 
 
-  int vo, voHeur;     // optimum values
-  int sdHeur;         // standard deviation against given optimum value
+//   int vo, voHeur;     // optimum values
+//   int sdHeur;         // standard deviation against given optimum value
 
-  int deposit;
+//   int deposit;
 
-  filename = argv[1];
-  deposit = atoi(argv[2]);
+//   filename = argv[1];
+//   deposit = atoi(argv[2]);
 
-  // build the graph with the instance data
-  graph = buildGraph(filename);
+//   // build the graph with the instance data
+//   graph = buildGraph(filename);
 
-  vector<Edge> path = maxBenefitPath(*graph, deposit);
+//   vector<Edge> path = maxBenefitPath(*graph, deposit);
 
-  // for(auto c = path.begin(); c != path.end(); ++c){
-  //   cout << c->n1;
-  //   cout << c->n2;
-  //   cout << '\n';
-  // }
+//   // for(auto c = path.begin(); c != path.end(); ++c){
+//   //   cout << c->n1;
+//   //   cout << c->n2;
+//   //   cout << '\n';
+//   // }
 
-  return 0;
-}
+//   return 0;
+// }
