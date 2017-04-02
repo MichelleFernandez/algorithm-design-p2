@@ -78,11 +78,14 @@ class Graph {
   }
 
   bool eraseEdge(Edge edge) {
+    if (t_list[edge.n1].empty()) {
+      return false;
+    }
+
+
     auto m = this->t_list[edge.n1].begin();
 
-    cout << m->n2;
     while ((m->n2 != edge.n2) && (m != t_list[edge.n1].end())) {
-      cout << m->n2;
       ++m;
     }
 
@@ -94,7 +97,7 @@ class Graph {
 
     m = this->t_list[edge.n2].begin();
 
-    while (m->n2 != edge.n1 && (m != t_list[edge.n1].end())) {
+    while ((m->n2 != edge.n1) && (m != t_list[edge.n1].end())) {
       ++m;
     }
 
@@ -105,6 +108,14 @@ class Graph {
       return false;
     }    
   }
+
+  bool eraseEdges(vector<Edge> eds) {
+    for (int i = 0 ; i < eds.size() ; i++) {
+      eraseEdge(eds[i]);
+    }
+    return true;
+  }
+
 
   bool tEmpty() {
     if (t_list.empty()) return true;
@@ -210,6 +221,95 @@ class Graph {
     return path_to[dst];
   }
 
+  int maxBenefit2(int src, int dst) {
+  // int maxBenefit(int src, int dst) {  
+    // vector<Edge> path;    
+    int vertices_num = this->vertex;
+
+    int benefit[vertices_num +1];
+    bool visited[vertices_num +1];
+    vector<vector<Edge>> path_to(vertices_num + 1);
+
+    int u, v;
+    Edge next_vertex(0,0,0,0);
+    int uv_benefit;
+    int max_benefit = -120000;
+    int visited_num = 0;
+
+    // initialize distances with the minimum int value
+    // and visited with false
+    for (int i = 0 ; i <= vertices_num ; ++i) {
+      benefit[i] = -120000;
+      visited[i] = false;
+    }
+
+    // distance of source is always zero
+    benefit[src] = 0;
+
+    // set source vertex as starting point
+    u = src;
+    //path.push_back(u);
+
+    while (u != dst && visited_num <= vertices_num) {
+      // mark next vertex as visited
+      visited[u] = true;
+      visited_num += 1;
+
+      // for every not visited edge leaving from u, analyze current benefit of v against 
+      // new benefit possible benefit given by the u-v path
+      for (auto e = this->a_list[u].begin() ; e != this->a_list[u].end() ; ++e) {
+        v = e->n2;
+        uv_benefit = benefit[u] +e->getBenefit();
+
+        // if the vertex doesn't have its maximum benefit already calculated (visited)
+        // and the newly calculated benefit is bigger than its current, 
+        // set it as the new current maximum benefit of v 
+        if ( !visited[v] && benefit[v] < uv_benefit ) {
+          benefit[v] = uv_benefit;
+
+          // store path to next vertex
+          if (!path_to[u].empty()) {
+            // for (auto f = path_to[u].begin() ; f != path_to[u].end() ; ++f) {
+              path_to[v] = path_to[u];
+            // }
+          }
+          path_to[v].push_back(*e);
+
+
+          // find the v vertex with maximum benefit of leaving from u.
+          if (uv_benefit > max_benefit) {
+            max_benefit = uv_benefit;
+            next_vertex = *e;
+          }
+        }
+      }
+
+      // The current path doesnt lead to the deposit
+      if (next_vertex.n2 == u) {
+        // find next max benefit vertex recorded
+        int next_max_benefit = benefit[0];
+        u = 1;
+        for (int i = 1 ; i < vertices_num + 1 ; i++) {
+          if (benefit[i] > next_max_benefit && !visited[i]) {
+            next_max_benefit = benefit[i];
+            u = i;
+          }
+        }
+      } else {
+        // add  to maximum benefit path
+        // path.push_back(next_vertex);
+        u = next_vertex.n2;
+      }
+
+      // set values for next iteration
+      max_benefit = -120000;
+    }
+
+    // return benefit[dst];
+    // return path;
+    return benefit[dst];
+  }
+
   // return the benefit of an edge composse for the nodes
   // u and v
   // int getTotalBenefit(int u, int v){
@@ -235,7 +335,7 @@ class Graph {
     auto m = this->a_list[edge.n1].begin();
 
     while (m->n2 != edge.n2) {
-      cout << m->n2;
+      // cout << m->n2;
       ++m;
     }
 
@@ -267,25 +367,27 @@ class Graph {
 
   /*
      printGraph
-     dijkstra maximum benefit path from source to destination vertices
   */
   void printGraph() {
     // required edges (T set)
     cout << 'T' << ':' << '\n';
     int i = 0;
     for (auto n=this->t_list.begin(); n != this->t_list.end() ; ++n) {
-      cout << '[' << i << ']' << '\n';
-      for (auto m = n->begin() ; m != n->end() ; ++m) {
-        cout << m->n1 << ' ';
-        cout << m->n2 << ' ';
-        cout << m->cost << ' ';
-        cout << m->benef << ' ';
-        if (m->crossed) {
-          cout << 'Y';
-        } else {
-          cout << 'N';
+      if (!n->empty()) {
+        
+        cout << '[' << i << ']' << '\n';
+        for (auto m = n->begin() ; m != n->end() ; ++m) {
+          cout << m->n1 << ' ';
+          cout << m->n2 << ' ';
+          cout << m->cost << ' ';
+          cout << m->benef << ' ';
+          if (m->crossed) {
+            cout << 'Y';
+          } else {
+            cout << 'N';
+          }
+          cout << '\n';
         }
-        cout << '\n';
       }
       ++i;
     }
