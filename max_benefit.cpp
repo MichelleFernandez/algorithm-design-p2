@@ -189,7 +189,7 @@ vector<Edge> maxBenefitPath(Graph graph, int deposit) {
 
   if (graph.t_list[b].empty()) {
     pair<Edge,int> edge1 = obtenerLado(graph.a_list, b);
-    max_benefit_path.push_back(edge1);
+    max_benefit_path.push_back(edge1.first);
     b = edge1.first.n2;
   }
 
