@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for file in /instanciasPRPP/*
+for file in instanciasPRPP/*
 do
-	./branch_and_bound "$file" 1 >> output.txt
+	./branc_and_bound.out "$file" 1 >> output.txt
 done
